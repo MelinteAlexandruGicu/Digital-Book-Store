@@ -16,6 +16,6 @@ public class AuthorModelAssembler implements RepresentationModelAssembler<Author
     public EntityModel<Author> toModel(Author author) {
         return EntityModel.of(author,
                 linkTo(methodOn(ABCController.class).getAuthor(author.getId())).withSelfRel(),
-                linkTo(methodOn(ABCController.class).getAllAuthors(author.getFirstname(), author.getLastname(), 2, 20)).withRel("authors"));
+                linkTo(methodOn(ABCController.class).getAllAuthorsWithRequestParam(author.getFirstname(), author.getLastname())).withRel("authors"));
     }
 }

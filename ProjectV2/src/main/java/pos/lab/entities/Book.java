@@ -1,6 +1,10 @@
 package pos.lab.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,6 +13,9 @@ import java.util.*;
 @Entity
 @Table(name = "book")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@NoArgsConstructor
+@Getter
+@Setter
 public class Book implements Serializable {
     @Id
     @Column(name = "isbn", nullable = false, length = 45)
@@ -26,59 +33,15 @@ public class Book implements Serializable {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set<BookAuthor> authors;
-
-    public Book() {
-    }
+    @JsonIgnore
+    private List<BookAuthor> authors = new ArrayList<>();
 
     public Book(Integer year, String title, String genre, String edition) {
         this.year = year;
         this.title = title;
         this.genre = genre;
         this.edition = edition;
-        authors = new HashSet<>();
     }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public String getEdition() {
-        return edition;
-    }
-
-    public void setEdition(String edition) {
-        this.edition = edition;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

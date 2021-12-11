@@ -1,6 +1,9 @@
 package pos.lab.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -8,6 +11,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "book_has_author")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@NoArgsConstructor
+@Getter
+@Setter
 public class BookAuthor {
     @EmbeddedId
     private BookAuthorId bookAuthorId;
@@ -25,9 +31,6 @@ public class BookAuthor {
     @Column(name = "indexx")
     private Integer indexx;
 
-    public BookAuthor() {
-    }
-
     public BookAuthor(Book bookIsbn, Author authorId, Integer indexx) {
         this.bookIsbn = bookIsbn;
         this.authorId = authorId;
@@ -35,37 +38,12 @@ public class BookAuthor {
         this.bookAuthorId = new BookAuthorId(bookIsbn.getIsbn(), authorId.getId());
     }
 
-    public BookAuthorId getBookAuthorId() {
-        return bookAuthorId;
-    }
-
-    public void setBookAuthorId(BookAuthorId bookAuthorId) {
-        this.bookAuthorId = bookAuthorId;
-    }
-
-    public Book getBookIsbn() {
-        return bookIsbn;
-    }
-
-    public void setBookIsbn(Book bookIsbn) {
+    public BookAuthor(Book bookIsbn, Author authorId) {
         this.bookIsbn = bookIsbn;
-    }
-
-    public Author getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(Author authorId) {
         this.authorId = authorId;
+        this.bookAuthorId = new BookAuthorId(bookIsbn.getIsbn(), authorId.getId());
     }
 
-    public Integer getIndexx() {
-        return indexx;
-    }
-
-    public void setIndexx(Integer indexx) {
-        this.indexx = indexx;
-    }
 
     @Override
     public boolean equals(Object o) {

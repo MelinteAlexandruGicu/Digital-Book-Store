@@ -1,6 +1,10 @@
 package pos.lab.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
@@ -9,35 +13,16 @@ import java.util.Objects;
 
 @Embeddable
 @JsonIgnoreProperties({"hibernateLazyInitialized", "handler"})
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@NotNull
 public class BookAuthorId implements Serializable {
     @NotNull
     private String book_isbn;
     @NotNull
     private Integer author_id;
-
-    public BookAuthorId() {
-    }
-
-    public BookAuthorId(String book_isbn, int author_id) {
-        this.book_isbn = book_isbn;
-        this.author_id = author_id;
-    }
-
-    public String getBook_isbn() {
-        return book_isbn;
-    }
-
-    public void setBook_isbn(String book_isbn) {
-        this.book_isbn = book_isbn;
-    }
-
-    public Integer getAuthor_id() {
-        return author_id;
-    }
-
-    public void setAuthor_id(Integer author_id) {
-        this.author_id = author_id;
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -9,9 +9,9 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface AuthorRepository extends JpaRepository<Author, Integer> {
-    Optional<List<Author>> findAllByBookAuthorsIn(Set<BookAuthor> bookAuthors);
+    List<Author> findAllByBookAuthorsIn(Set<BookAuthor> bookAuthors);
 
-    Optional<List<Author>> findByFirstname(String firstname);
+    Optional<Author> findByFirstname(String firstname);
 
-    Optional<List<Author>> findByLastname(String lastname);
+    Optional<Author> findByLastname(String lastname);
 }

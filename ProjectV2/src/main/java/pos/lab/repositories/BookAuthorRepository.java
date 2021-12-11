@@ -11,5 +11,5 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface BookAuthorRepository extends JpaRepository<BookAuthor, BookAuthorId> {
-    Optional<Set<BookAuthor>> findByBookIsbnIsbn(String bookIsbn);
+    Set<BookAuthor> findByBookIsbnIsbn(String bookIsbn);
 }

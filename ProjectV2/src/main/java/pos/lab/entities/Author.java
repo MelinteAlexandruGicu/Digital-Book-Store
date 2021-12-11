@@ -1,6 +1,12 @@
 package pos.lab.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NaturalIdCache;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,6 +15,9 @@ import java.util.*;
 @Entity
 @Table(name = "author")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@NoArgsConstructor
+@Getter
+@Setter
 public class Author implements Serializable {
     @Id
     @GeneratedValue
@@ -24,38 +33,11 @@ public class Author implements Serializable {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set<BookAuthor> bookAuthors = new HashSet<BookAuthor>();
-
-    public Author() {
-
-    }
+    @JsonIgnore
+    private List<BookAuthor> bookAuthors = new ArrayList<>();
 
     public Author(String firstname, String lastname) {
         this.firstname = firstname;
-        this.lastname = lastname;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
         this.lastname = lastname;
     }
 
