@@ -1,7 +1,7 @@
 package pos.lab.OrderModule.entities;
 
 public enum Status {
-    initialized,
-    active,
-    finalized
+    IN_PROGRESS,
+    COMPLETED,
+    CANCELLED
 }

@@ -17,4 +17,6 @@ public class BookModelAssembler implements RepresentationModelAssembler<Book, En
                 linkTo(methodOn(ABCController.class).getBook(book.getIsbn())).withSelfRel(),
                 linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(book.getYear(), book.getTitle(), book.getGenre())).withRel("books"));
     }
+
+
 }

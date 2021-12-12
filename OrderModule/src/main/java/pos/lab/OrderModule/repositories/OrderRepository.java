@@ -9,7 +9,4 @@ import java.awt.print.Pageable;
 import java.util.List;
 
 public interface OrderRepository extends MongoRepository<Order, String>, PagingAndSortingRepository<Order, String> {
-    Order findByObjectid();
-
-    Page<List<Order>> findAll(Pageable pageable);
 }
