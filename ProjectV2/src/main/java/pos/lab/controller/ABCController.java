@@ -1,9 +1,13 @@
 package pos.lab.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pos.lab.assemblers.AuthorModelAssembler;
@@ -13,6 +17,7 @@ import pos.lab.entities.Book;
 import pos.lab.repositories.AuthorRepository;
 import pos.lab.repositories.BookAuthorRepository;
 import pos.lab.repositories.BookRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -21,88 +26,90 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class ABCController {
     @Autowired
-    private final BookRepository bookRepository;
+    private BookRepository bookRepository;
     @Autowired
-    private final AuthorRepository authorRepository;
+    private AuthorRepository authorRepository;
     @Autowired
-    private final BookAuthorRepository bookAuthorRepository;
+    private BookAuthorRepository bookAuthorRepository;
     @Autowired
-    private final BookModelAssembler bookModelAssembler;
+    private BookModelAssembler bookModelAssembler;
     @Autowired
-    private final AuthorModelAssembler authorModelAssembler;
-
-    public ABCController(BookRepository bookRepository, AuthorRepository authorRepository, BookAuthorRepository bookAuthorRepository, BookModelAssembler bookModelAssembler, AuthorModelAssembler authorModelAssembler) {
-        this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
-        this.bookAuthorRepository = bookAuthorRepository;
-        this.bookModelAssembler = bookModelAssembler;
-        this.authorModelAssembler = authorModelAssembler;
-    }
-
-//    @GetMapping("/api/bookCollection/books")
-//    public CollectionModel<EntityModel<Book>> getAllBooks() {
-//        List<EntityModel<Book>> books = bookRepository.findAll().stream()
-//                .map(bookModelAssembler::toModel)
-//                .collect(Collectors.toList());
-//        return CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooks()).withSelfRel());
-//    }
+    private AuthorModelAssembler authorModelAssembler;
 
     /////////////////////////////////////////////////   BOOK   //////////////////////////////////////////////////
+    /*@RequestMapping(value = "/api/bookCollection/books", method = RequestMethod.OPTIONS)
+    ResponseEntity<?> getAllBooksWithRequestParam()
+    {
+        return ResponseEntity.ok().allow(HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS)
+                .build();
+    }*/
 
     @GetMapping("/api/bookCollection/books")
     public ResponseEntity<CollectionModel<EntityModel<Book>>> getAllBooksWithRequestParam(
             @RequestParam(value = "year", required = false) Integer year,
             @RequestParam(value = "title", required = false) String title,
-            @RequestParam(value = "genre", required = false) String genre
-            /*@RequestParam(value = "page", required = false) Optional<Integer> page,
-            @RequestParam(value = "items_per_page", required = false) Optional<Integer> itemPerPage*/
+            @RequestParam(value = "genre", required = false) String genre,
+            @RequestParam(defaultValue = "0", required = false) Integer pageNo,
+            @RequestParam(defaultValue = "10", required = false) Integer pageSize,
+            @RequestParam(defaultValue = "isbn", required = false) String sortBy
     ) {
-        if(year == null && title != null && genre != null)
-        {
-            List<EntityModel<Book>> books = bookRepository.findBookByGenreAndTitle(genre, title).stream()
-                    .map(bookModelAssembler::toModel).collect(Collectors.toList());
-            return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, title, genre)).withSelfRel()));
-        }
-        if(year == null && title == null && genre != null)
-        {
-            List<EntityModel<Book>> books = bookRepository.findBookByGenre(genre).stream()
-                    .map(bookModelAssembler::toModel).collect(Collectors.toList());
-            return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, null, genre)).withSelfRel()));
-        }
-        if(year == null && title != null)
-        {
-            List<EntityModel<Book>> books = bookRepository.findBookByTitle(title).stream()
-                    .map(bookModelAssembler::toModel).collect(Collectors.toList());
-            return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, title, null)).withSelfRel()));
-        }
-        if(year != null && genre != null && title == null)
-        {
-            List<EntityModel<Book>> books = bookRepository.findBookByYearAndGenre(year, genre).stream()
-                    .map(bookModelAssembler::toModel).collect(Collectors.toList());
-            return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, null, genre)).withSelfRel()));
-        }
+            if (year == null && title != null && genre != null) {
+                List<EntityModel<Book>> books = bookRepository.findBookByGenreAndTitle(genre, title).stream()
+                        .map(bookModelAssembler::toModel).collect(Collectors.toList());
+                return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, title, genre, pageNo, pageSize, sortBy)).withSelfRel()));
+            }
+            if (year == null && title == null && genre != null) {
+                List<EntityModel<Book>> books = bookRepository.findBookByGenre(genre).stream()
+                        .map(bookModelAssembler::toModel).collect(Collectors.toList());
+                return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, null, genre, pageNo, pageSize, sortBy)).withSelfRel()));
+            }
+            if (year == null && title != null) {
+                List<EntityModel<Book>> books = bookRepository.findBookByTitle(title).stream()
+                        .map(bookModelAssembler::toModel).collect(Collectors.toList());
+                return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, title, null, pageNo, pageSize, sortBy)).withSelfRel()));
+            }
+            if (year != null && genre != null && title == null) {
+                List<EntityModel<Book>> books = bookRepository.findBookByYearAndGenre(year, genre).stream()
+                        .map(bookModelAssembler::toModel).collect(Collectors.toList());
+                return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, null, genre, pageNo, pageSize, sortBy)).withSelfRel()));
+            }
 
-        if(year != null && genre == null && title != null)
-        {
-            List<EntityModel<Book>> books = bookRepository.findBookByYearAndTitle(year, title).stream()
-                    .map(bookModelAssembler::toModel).collect(Collectors.toList());
-            return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, title, null)).withSelfRel()));
-        }
+            if (year != null && genre == null && title != null) {
+                List<EntityModel<Book>> books = bookRepository.findBookByYearAndTitle(year, title).stream()
+                        .map(bookModelAssembler::toModel).collect(Collectors.toList());
+                return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, title, null, pageNo, pageSize, sortBy)).withSelfRel()));
+            }
 
-        if(year != null && genre == null)
-        {
-            List<EntityModel<Book>> books = bookRepository.findBookByYear(year).stream()
-                    .map(bookModelAssembler::toModel)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, null, null)).withSelfRel()));
-        }
+            if (year != null && genre == null) {
+                List<EntityModel<Book>> books = bookRepository.findBookByYear(year).stream()
+                        .map(bookModelAssembler::toModel)
+                        .collect(Collectors.toList());
+                return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(year, null, null, pageNo, pageSize, sortBy)).withSelfRel()));
+            }
 
-        List<EntityModel<Book>> books = bookRepository.findAll().stream()
-                .map(bookModelAssembler::toModel)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(null, null, null)).withSelfRel()));
+            if(pageNo == null && pageSize == null && sortBy == null)
+            {
+                List<EntityModel<Book>> books = bookRepository.findAll().stream()
+                        .map(bookModelAssembler::toModel)
+                        .collect(Collectors.toList());
+                return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(null, null, null, null, null, null)).withSelfRel().withType("GET")));
+            }
+            else
+            {
+                Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+                List<EntityModel<Book>> books = bookRepository.findAll(paging).stream()
+                        .map(bookModelAssembler::toModel)
+                        .collect(Collectors.toList());
+                return ResponseEntity.ok(CollectionModel.of(books, linkTo(methodOn(ABCController.class).getAllBooksWithRequestParam(null, null, null, pageNo, pageSize, sortBy)).withSelfRel().withType("GET")));
+            }
     }
 
+    /*@RequestMapping(value = "/api/bookCollection/books", method = RequestMethod.OPTIONS)
+    ResponseEntity<?> getBook()
+    {
+        return ResponseEntity.ok().allow(HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.OPTIONS)
+                .build();
+    }*/
     @GetMapping("/api/bookCollection/books/{isbn}")
     public ResponseEntity<?> getBook(@PathVariable String isbn) {
         EntityModel<Book> entityModel = null;
